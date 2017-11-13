@@ -1,4 +1,4 @@
-function [Kel,fel_cellule1,fel_cellule2] = matK_elem(S1, S2, S3, psi,type)
+function [Kel] = matK_elem(S1, S2, S3, psi,type)
 
 % preliminaires, pour faciliter la lecture:
 x1 = S1(1); y1 = S1(2);
@@ -33,12 +33,5 @@ for i=1:3
     Kel(i,j) = (     (  A_quad*inv(Jacobian')*(norm_ref(i,:))'  )' * (inv(Jacobian')*norm_ref(j,:)') ) * abs(det(Jacobian));
   end; % j
 end; % i
-
-fel_cellule1 = zeros(1,3);
-fel_cellule2 = zeros(1,3);
-for p=1:3
-    fel_cellule1(p) = (     (  A_quad*(norm_ref(2,:))'  )' * (inv(Jacobian')*norm_ref(p,:)') ) * abs(det(Jacobian));
-    fel_cellule2(p) = (     (  A_quad*(norm_ref(3,:))'  )' * (inv(Jacobian')*norm_ref(p,:)') ) * abs(det(Jacobian));
-end
 
 end

@@ -1,6 +1,6 @@
 function [KK,MM,PP,LL,Coorneu,Numtri] = assemble_fem(epsilon,typeA,BC,cellule,nom_maillage)
 
-[Nbpt,Nbtri,Coorneu,Refneu,Numtri,Reftri,Nbaretes,Numaretes,Refaretes]=lecture_msh(nom_maillage);
+[Nbpt,Nbtri,Coorneu,Refneu,Numtri,~,Nbaretes,~,~]=lecture_msh(nom_maillage);
 
 %% calcul des matrices EF
 
@@ -9,8 +9,6 @@ function [KK,MM,PP,LL,Coorneu,Numtri] = assemble_fem(epsilon,typeA,BC,cellule,no
     KK = sparse(Nbpt,Nbpt); % matrice de rigidite
     MM = sparse(Nbpt,Nbpt); % matrice de rigidite
     LL = zeros(Nbpt,1);     % vecteur second membre
-    LLcel1 = zeros(Nbpt,1);    % vecteur second membre du probleme de cellule 1
-    LLcel2 = zeros(Nbpt,1);    % vecteur second membre du probleme de cellule 2
     
 % boucle sur les triangles
 % ------------------------
@@ -21,7 +19,7 @@ function [KK,MM,PP,LL,Coorneu,Numtri] = assemble_fem(epsilon,typeA,BC,cellule,no
     S3 = Coorneu(Numtri(l,3),:);
   % calcul des matrices elementaires du triangle l 
   
-    [Kel,fcell1,fcell2]=matK_elem(S1, S2, S3, epsilon, typeA);
+    Kel=matK_elem(S1, S2, S3, epsilon, typeA);
     Mel=matM_elem(S1, S2, S3);
     for i=1:3
           I = Numtri(l,i);
@@ -30,9 +28,6 @@ function [KK,MM,PP,LL,Coorneu,Numtri] = assemble_fem(epsilon,typeA,BC,cellule,no
             KK(I,J) = KK(I,J) + Kel(i,j);
             MM(I,J) = MM(I,J) + Mel(i,j);
         end % for j
-        % assemblage des seconds membres des problemes de cellule
-        LLcel1(I,1) = LLcel1(I,1) + fcell1(i);
-        LLcel2(I,1) = LLcel2(I,1) + fcell2(i);
     end %  for i
 
     end % for l
@@ -40,12 +35,11 @@ function [KK,MM,PP,LL,Coorneu,Numtri] = assemble_fem(epsilon,typeA,BC,cellule,no
 %% Calcul du second membre L du probleme initial
 % -------------------------
 
-    FF = f(Coorneu(:,1),Coorneu(:,2),epsilon,typeA,'dirichlet');
+    FF = f(Coorneu(:,1),Coorneu(:,2),epsilon,typeA);
     LL = MM * FF;
+    LLcel1 = - KK*Coorneu(:,1); % vecteur second membre du probleme de cellule 1
+    LLcel2 = - KK*Coorneu(:,2); % vecteur second membre du probleme de cellule 2
     
-    LLcel1 = -LLcel1; LLcel2 = -LLcel2;
-    
-
     
 %% Constructions des matrices pour la pseudo elimination
 
@@ -98,8 +92,7 @@ elseif strcmp(BC,'periodique')
 end 
 
 if strcmp(cellule,'yes')
-    LL = [LLcel1,LLcel2];
+    LL = [LLcel1, LLcel2];
 end
-    
-    %FF_0 = PP*FF;
+
 end

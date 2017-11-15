@@ -10,7 +10,7 @@ cd('/home/philippe/Documents/MATLAB/X01/TP3');
 addpath('/home/philippe/Documents/MATLAB/X01/TP3/Mesh')
 mesh_name = [{'geomCarre02.msh'},{'geomCarre01.msh'},{'geomCarre005.msh'},{'geomCarre002.msh'},{'geomCarre001.msh'}];
 h = [0.2, 0.1, 0.05, 0.02, 0.01]; % size of the meshes with decreasing order 
-num_mesh = 3; % choose the mesh to use
+num_mesh = 4; % choose the mesh to use
 h =  h(num_mesh);
 % -----------------------------------------------------------------------------------------------------------------------
 
@@ -18,7 +18,8 @@ h =  h(num_mesh);
 % Parametre de la taille de la microstructure du problème: On fait varier
 % le nombre d'élements par période en changeant epsilon: la période doit
 % etre choisie assez grande par rapport au pas de maillage
-epsilon = [40*h,35*h,30*h,25*h,20*h,15*h,10*h,8*h,4*h,2*h];
+%epsilon = [2,0.5,0.1,0.05];
+epsilon = [4,1,0.4,0.2,0.08,0.03];
 Nb_epsilon = length(epsilon);
 % -----------------------------------------------------------------------------------------------------------------------
 
@@ -119,14 +120,14 @@ disp(['solving time homogenized problem = ' num2str(time3) ' sec']);
     disp(['solving time errors = ' num2str(time4) ' sec']);
     disp(['total time = ' num2str(time1+time2+time3+time4) ' sec']);
     fprintf('\n');
+    
+    % visualisation
+    affiche(UU_ini, Numtri, Coorneu, sprintf('ini, eps = %g', epsilon(i)));
+    affiche(UU_cel(:,1), Numtri_cel, Coorneu_cel, sprintf('Cel 1, eps = %g', epsilon(i)));
+    affiche(UU_cel(:,2), Numtri_cel, Coorneu_cel, sprintf('Cel 2, eps = %g', epsilon(i)));
+    affiche(UU_hom, Numtri, Coorneu, sprintf('hom, eps = %g', epsilon(i)));
 end
 %% Plot figures
-
-% visualisation
-    affiche(UU_ini, Numtri, Coorneu, sprintf('Probleme ini'));
-    affiche(UU_cel(:,1), Numtri_cel, Coorneu_cel, sprintf('Cellule 1'));
-    affiche(UU_cel(:,2), Numtri_cel, Coorneu_cel, sprintf('Cellule 2'));
-    affiche(UU_hom, Numtri, Coorneu, sprintf('Probleme homogeneise'));
     
 %plot norme L2
     fig2 = figure();
